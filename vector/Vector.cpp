@@ -278,7 +278,7 @@ void Vector::popBack()
     }
     else
     {
-    	throw std::out_of_range("REmobal from empty vector");
+    	throw std::out_of_range("Remobal from empty vector");
     }
   
 }
@@ -295,7 +295,7 @@ void Vector::popFront()
     }
     else
     {
-    	throw std::out_of_range("REmobal from empty vector");
+    	throw std::out_of_range("Remobal from empty vector");
     }
 }
 //---------------------------------------------------------------------------
