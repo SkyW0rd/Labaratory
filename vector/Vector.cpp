@@ -136,7 +136,7 @@ void Vector::pushBack(const Value& value)
     	_data = new Value [_capacity];
     	for(size_t i = 0; i < _size - 1;i++)
 	{
-    	    _data[i]=buf[i];
+    	    _data[i] = buf[i];
 	}
     }
     _data[_size - 1] = value;
@@ -157,10 +157,10 @@ void Vector::pushFront(const Value& value)
     	{
     	    buf[i]=_data[i];
     	}
-    	Value* _data = new Value [_capacity];
+    	_data = new Value [_capacity];
     	for(size_t i = 0; i < _size - 1;i++)
     	{
-    	    _data[i]=buf[i];
+    	    _data[i]  = buf[i];
     	}
     }
     for(size_t i = _size - 1; i > 0; i--)
@@ -187,7 +187,7 @@ void Vector::insert(const Value& value, size_t pos){
     	_data = new Value [_capacity];
     	for(size_t i = 0; i < _size - 1;i++)
     	{
-    	    _data[i]=buf[i];
+    	    _data[i] = buf[i];
     	}
     }
     for (size_t i = _size - 1; i > pos; i--)
@@ -205,18 +205,19 @@ void Vector::insert(const Value* values, size_t size ,size_t pos)
         if (_capacity == 0)
         {
             _capacity = 1;
+	{
         while (_size >= _capacity)
         {
             _capacity *= _multiplicativeCoef;
-            Value * buf = new Value[_size-size];
+            Value * buf = new Value[_size - size];
             for(size_t i = 0; i < _size-size;i++)
             {
                 buf[i]=_data[i];
             }
             _data = new Value [_capacity];
-            for(size_t i = 0; i < _size-size;i++)
+            for(size_t i = 0; i < _size - size;i++)
             {
-                _data[i]=buf[i];
+                _data[i] = buf[i];
             }
         }
     }
@@ -253,7 +254,7 @@ void Vector::insert(const Vector& vector, size_t pos)
     	    _data = new Value [_capacity];
     	    for(size_t i = 0; i < _size-vector._size;i++)
 	    {
-    	    	_data[i]=buf[i];
+    	    	_data[i] = buf[i];
 	    }
     	}
     }
