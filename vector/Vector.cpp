@@ -1,5 +1,30 @@
 #include "Vector.h"
 #include <iostream>
+
+void Vector::_swap(size_t size, size_t pos)
+{
+    for (size_t i = 1; i <= size; i++)
+    {
+    	for (size_t j = _size - size + i; j > pos; j--)
+	    {
+    	    _data[j] = _data[j - 1];
+	    }
+    }
+}
+
+void Vector::_memory(size_t size)
+{
+    Value* buf = new Value[_size - size];
+    for(size_t i = 0; i < _size - size; i++)
+    {
+        buf[i]=std::move(_data[i]);
+    }
+    _data = new Value [_capacity];
+    for(size_t i = 0; i < _size - size;i++)
+    {
+        _data[i] = std::move(buf[i]);
+    }
+}
 //---------------------------------------------------------------------------
 Value& Iterator::operator*()
 {
@@ -99,14 +124,10 @@ Vector& Vector::operator=(Vector&& other) noexcept
     	return *this;
     }
     delete[] _data;
-    _size = other._size;
-    _data = new Value[other._size];
-    for (size_t i = 0; i < _size; i++)
-    {
-    	_data[i] = other._data[i];
-    }
-    _capacity = other._size;
-    _multiplicativeCoef = other._multiplicativeCoef;
+    _data = std::move(other._data);
+    _size = std::move(other._size);
+    _capacity = std::move(other._capacity);
+    _multiplicativeCoef = std::move(other._multiplicativeCoef);
     return *this;
 }
 //---------------------------------------------------------------------------
@@ -124,22 +145,13 @@ void Vector::pushBack(const Value& value)
     if (_size >= _capacity)
     {
     	if (_capacity == 0)
-	{
+	    {
     	    _capacity = 1;
-	}
-    	_capacity *= _multiplicativeCoef;
-    	Value* buf = new Value[_size - 1];
-    	for(size_t i = 0; i < _size - 1;i++)
-	{
-    	    buf[i]=_data[i];
-	}
-    	_data = new Value [_capacity];
-    	for(size_t i = 0; i < _size - 1;i++)
-	{
-    	    _data[i] = buf[i];
-	}
+	    }
+        _capacity *= _multiplicativeCoef;
+    	_memory(1);
     }
-    _data[_size - 1] = value;
+    _data[_size] = value;
 }
 //---------------------------------------------------------------------------
 void Vector::pushFront(const Value& value)
@@ -151,17 +163,8 @@ void Vector::pushFront(const Value& value)
     	{
     	    _capacity = 1;
     	}
-    	_capacity *= _multiplicativeCoef;
-    	Value * buf = new Value[_size - 1];
-    	for(size_t i = 0; i < _size - 1;i++)
-    	{
-    	    buf[i]=_data[i];
-    	}
-    	_data = new Value [_capacity];
-    	for(size_t i = 0; i < _size - 1;i++)
-    	{
-    	    _data[i]  = buf[i];
-    	}
+        _capacity *= _multiplicativeCoef;
+        _memory(1);
     }
     for(size_t i = _size - 1; i > 0; i--)
     {
@@ -178,17 +181,8 @@ void Vector::insert(const Value& value, size_t pos){
     	{
     	    _capacity = 1;
     	}
-    	_capacity *= _multiplicativeCoef;
-    	Value * buf = new Value[_size-1];
-    	for(size_t i = 0; i < _size - 1;i++)
-    	{
-    	    buf[i]=_data[i];
-    	}
-    	_data = new Value [_capacity];
-    	for(size_t i = 0; i < _size - 1;i++)
-    	{
-    	    _data[i] = buf[i];
-    	}
+        _capacity *= _multiplicativeCoef;
+        _memory(1);
     }
     for (size_t i = _size - 1; i > pos; i--)
     {
@@ -205,29 +199,14 @@ void Vector::insert(const Value* values, size_t size ,size_t pos)
         if (_capacity == 0)
         {
             _capacity = 1;
-	{
+        }
         while (_size >= _capacity)
         {
             _capacity *= _multiplicativeCoef;
-            Value * buf = new Value[_size - size];
-            for(size_t i = 0; i < _size-size;i++)
-            {
-                buf[i]=_data[i];
-            }
-            _data = new Value [_capacity];
-            for(size_t i = 0; i < _size - size;i++)
-            {
-                _data[i] = buf[i];
-            }
+            _memory(size);
         }
     }
-    for (size_t i = 1; i <= size; i++)
-    {
-    	for (size_t j = _size - size + i; j > pos; j--)
-        {
-    	    _data[j] = _data[j - 1];
-        }
-    }
+    _swap(size, pos);
     for (size_t i = 0; i < size; i++)
     {
     	_data[pos + i] = values[i];
@@ -240,31 +219,16 @@ void Vector::insert(const Vector& vector, size_t pos)
     if(_size >= _capacity)
     {
     	if (_capacity == 0)
-	{
+	    {
     	    _capacity = 1;
-	}
+	    }
     	while (_size >= _capacity)
     	{
-    	    _capacity *= _multiplicativeCoef;
-    	    Value * buf = new Value[_size-vector._size];
-    	    for(size_t i = 0; i < _size-vector._size;i++)
-	    {
-    	    	buf[i]=_data[i];
-	    }
-    	    _data = new Value [_capacity];
-    	    for(size_t i = 0; i < _size-vector._size;i++)
-	    {
-    	    	_data[i] = buf[i];
-	    }
+            _capacity *= _multiplicativeCoef;
+            _memory(vector._size);
     	}
     }
-    for (size_t i = 1; i <= vector._size; i++)
-    {
-    	for (size_t j = _size - vector._size + i; j > pos; j--)
-	{
-    	    _data[j] = _data[j - 1];
-	}
-    }
+    _swap(vector._size, pos);
     for (size_t i = 0; i < vector._size; i++)
     {
     	_data[pos + i] = vector._data[i];
@@ -279,7 +243,7 @@ void Vector::popBack()
     }
     else
     {
-    	throw std::out_of_range("Remobal from empty vector");
+    	throw std::out_of_range("Removal from empty vector");
     }
   
 }
@@ -289,34 +253,28 @@ void Vector::popFront()
     if (_size != 0)
     {
     	for (size_t i = 0; i < _size - 1; i++)
-	{
+	    {
     	    _data[i] = _data[i + 1];
-	}
+	    }
     	_size--;
     }
     else
     {
-    	throw std::out_of_range("Remobal from empty vector");
+    	throw std::out_of_range("Removal from empty vector");
     }
 }
 //---------------------------------------------------------------------------
 void Vector::erase(size_t pos, size_t count)
 {
-    if (pos + count > _size)
+    if (count > _size)
     {
-        for (size_t i = pos; i <= _size; i++)
-	{
-            _size--;
-	}
+        _size = _size - (_size - pos);
     }
     else
     {
         for (size_t i = 0; i < count; i++)
         {
-            if (i + pos + count <= _size)
-	    {
-                _data[i + pos] = _data[i + pos + count];
-	    }
+            _data[i + pos] = _data[i + pos + count];
             _size--;
         }
     }
@@ -339,7 +297,7 @@ size_t Vector::capacity() const
 //---------------------------------------------------------------------------
 double Vector::loadFactor() const
 {
-    return _capacity / _size;
+    return double(_size) / _capacity;
 }
 //---------------------------------------------------------------------------
 Value& Vector::operator[](size_t idx)
@@ -369,31 +327,16 @@ void Vector::reserve(size_t capacity)
     if (capacity != 0 && capacity > _capacity)
     {
     	_capacity = capacity;
-    	Value* buf = new Value[_size];
-    	for (size_t i = 0; i < _size; i++)
-    	{
-    	    buf[i] = _data[i];
-    	}
-    	_data = new Value[_capacity];
-    	for (size_t i = 0; i < _size; i++)
-    	{
-    	    _data[i] = buf[i];
-    	}
+        _memory(0);
     }
 }
 //---------------------------------------------------------------------------
 void Vector::shrinkToFit()
 {
-    _capacity = _size;
-    Value * buf = new Value[_size];
-    for(size_t i = 0; i < _size;i++)
+    if (_capacity != _size)
     {
-    	buf[i]=_data[i];
-    }
-    _data = new Value [_capacity];
-    for(size_t i = 0; i < _size;i++)
-    {
-    	_data[i]=buf[i];
+        _capacity = _size;
+       _memory(0);
     }
 }
 //---------------------------------------------------------------------------
