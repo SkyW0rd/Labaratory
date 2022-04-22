@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
+#include <stdexcept>
 using Value = double;
 namespace
 {
@@ -12,19 +13,15 @@ namespace
 
 class Iterator
 {
-	Value* _ptr;
+    Value* _ptr;
 public:
-    explicit Iterator(Value* ptr) : _ptr(ptr) {}
-    
+    explicit Iterator(Value* ptr) : _ptr(ptr){}
     Value& operator*();
     const Value& operator*() const;
-    
     Value* operator->();
     const Value* operator->() const;
-    
     Iterator operator++();
     Iterator operator++(int);
-    
     bool operator==(const Iterator& other) const;
     bool operator!=(const Iterator& other) const;
 };
@@ -44,7 +41,7 @@ public:
     ~Vector();
 
     Iterator begin();
-    Iterator end();
+	Iterator end();
 
     void pushBack(const Value& value);
 
@@ -71,14 +68,17 @@ public:
     Value& operator[](size_t idx);
     const Value& operator[](size_t idx) const;
 
-    long long find(const Value& value) const;
+   long long find(const Value& value) const;
 
-    void reserve(size_t capacity);
+   void reserve(size_t capacity);
 
-    void shrinkToFit();
+   void shrinkToFit();
+
 private:
     Value* _data = nullptr;
     size_t _size = 0;
     size_t _capacity = 0;
     float _multiplicativeCoef = 2.0f;
+    void _memory(size_t size);
+    void _swap(size_t size, size_t pos);
 };
