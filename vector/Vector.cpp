@@ -4,7 +4,7 @@
 void Vector::_swap(size_t size, size_t pos)
 {
     int count = 1;
-    for (size_t i = _size - 1; i >= size; i--)
+    for (size_t i = _size - 1; i > pos; i--)
     {
         _data[i] = _data[_size - size - count];
 	count++;
