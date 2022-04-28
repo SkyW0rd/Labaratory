@@ -3,27 +3,42 @@
 
 void Vector::_swap(size_t size, size_t pos)
 {
-    for (size_t i = 1; i <= size; i++)
+    int count = 0;
+    for (size_t i = _size - size + 1; i < _size; i++)
     {
-    	for (size_t j = _size - size + i; j > pos; j--)
-	    {
-    	    _data[j] = _data[j - 1];
-	    }
+        _data[i] = _data[pos + count];
+	count++;
     }
 }
 
-void Vector::_memory(size_t size)
+void Vector::_realloc(size_t count)
 {
-    Value* buf = new Value[_size - size];
-    for(size_t i = 0; i < _size - size; i++)
+    if (_size >= _capacity)
     {
-        buf[i]=std::move(_data[i]);
+    	if (_capacity == 0)
+	{
+    	    _capacity = 1;
+	}
+        _capacity *= _multiplicativeCoef;
+        Value* buf = new Value[_capacity];
+        for(size_t i = 0; i < _size - count; i++)
+        {
+            buf[i]=std::move(_data[i]);
+        }
+        delete[] _data;
+        _data = &buf;
     }
-    _data = new Value [_capacity];
-    for(size_t i = 0; i < _size - size;i++)
-    {
-        _data[i] = std::move(buf[i]);
-    }
+}
+
+void Vector::_memory(size_t count)
+{
+	Value* buf = new Value[_capacity];
+        for(size_t i = 0; i < _size - count; i++)
+        {
+            buf[i]=std::move(_data[i]);
+        }
+        delete[] _data;
+        _data = &buf;
 }
 //---------------------------------------------------------------------------
 Value& Iterator::operator*()
@@ -142,30 +157,14 @@ Vector::~Vector()
 void Vector::pushBack(const Value& value)
 {
     _size++;
-    if (_size >= _capacity)
-    {
-    	if (_capacity == 0)
-	    {
-    	    _capacity = 1;
-	    }
-        _capacity *= _multiplicativeCoef;
-    	_memory(1);
-    }
+    _realloc(1);
     _data[_size] = value;
 }
 //---------------------------------------------------------------------------
 void Vector::pushFront(const Value& value)
 {
     _size++;
-    if (_size >= _capacity)
-    {
-    	if (_capacity == 0)
-    	{
-    	    _capacity = 1;
-    	}
-        _capacity *= _multiplicativeCoef;
-        _memory(1);
-    }
+    _realloc(1);
     for(size_t i = _size - 1; i > 0; i--)
     {
         _data[i] = _data[i - 1];
@@ -175,15 +174,7 @@ void Vector::pushFront(const Value& value)
 //---------------------------------------------------------------------------
 void Vector::insert(const Value& value, size_t pos){
     _size += 1;
-    if (_size >= _capacity)
-    {
-    	if (_capacity == 0)
-    	{
-    	    _capacity = 1;
-    	}
-        _capacity *= _multiplicativeCoef;
-        _memory(1);
-    }
+    _realloc(1);
     for (size_t i = _size - 1; i > pos; i--)
     {
         _data[i] = _data[i - 1];
@@ -194,17 +185,9 @@ void Vector::insert(const Value& value, size_t pos){
 void Vector::insert(const Value* values, size_t size ,size_t pos)
 {
     _size += size;
-    if(_size >= _capacity)
+    while (_size >= _capacity)
     {
-        if (_capacity == 0)
-        {
-            _capacity = 1;
-        }
-        while (_size >= _capacity)
-        {
-            _capacity *= _multiplicativeCoef;
-            _memory(size);
-        }
+        _realloc(size);
     }
     _swap(size, pos);
     for (size_t i = 0; i < size; i++)
@@ -215,24 +198,7 @@ void Vector::insert(const Value* values, size_t size ,size_t pos)
 //---------------------------------------------------------------------------
 void Vector::insert(const Vector& vector, size_t pos)
 {
-    _size += vector._size;
-    if(_size >= _capacity)
-    {
-    	if (_capacity == 0)
-	    {
-    	    _capacity = 1;
-	    }
-    	while (_size >= _capacity)
-    	{
-            _capacity *= _multiplicativeCoef;
-            _memory(vector._size);
-    	}
-    }
-    _swap(vector._size, pos);
-    for (size_t i = 0; i < vector._size; i++)
-    {
-    	_data[pos + i] = vector._data[i];
-    }
+    insert(vector._data, vector._size, pos);
 }
 //---------------------------------------------------------------------------
 void Vector::popBack()
@@ -253,9 +219,9 @@ void Vector::popFront()
     if (_size != 0)
     {
     	for (size_t i = 0; i < _size - 1; i++)
-	    {
+	{
     	    _data[i] = _data[i + 1];
-	    }
+	}
     	_size--;
     }
     else
@@ -319,7 +285,7 @@ long long Vector::find(const Value& value) const
     	    return i;
     	}
     }
-    return 0;
+    return -1;
 }
 //---------------------------------------------------------------------------
 void Vector::reserve(size_t capacity)
