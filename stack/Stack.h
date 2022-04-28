@@ -37,5 +37,4 @@ class Stack
   private:
     IStackImplementation* _pimpl = nullptr;
     StackContainer _containerType;
-    
 };
