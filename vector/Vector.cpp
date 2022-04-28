@@ -26,7 +26,7 @@ void Vector::_realloc(size_t count)
             buf[i]=std::move(_data[i]);
         }
         delete[] _data;
-        _data = &buf;
+        _data = buf;
     }
 }
 
@@ -38,7 +38,7 @@ void Vector::_memory(size_t count)
             buf[i]=std::move(_data[i]);
         }
         delete[] _data;
-        _data = &buf;
+        _data = buf;
 }
 //---------------------------------------------------------------------------
 Value& Iterator::operator*()
@@ -290,11 +290,16 @@ long long Vector::find(const Value& value) const
 //---------------------------------------------------------------------------
 void Vector::reserve(size_t capacity)
 {
-    if (capacity != 0 && capacity > _capacity)
+    if (capacity <= _capacity)
+    {
+        return;
+    }
+    else
     {
     	_capacity = capacity;
         _memory(0);
     }
+    
 }
 //---------------------------------------------------------------------------
 void Vector::shrinkToFit()
