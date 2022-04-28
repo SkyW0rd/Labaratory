@@ -232,7 +232,7 @@ void Vector::popFront()
 //---------------------------------------------------------------------------
 void Vector::erase(size_t pos, size_t count)
 {
-    if (count > _size)
+    if (count + pos > _size)
     {
         _size = _size - (_size - pos);
     }
