@@ -41,7 +41,7 @@ Stack& Stack::operator=(const Stack& copyStack)
 {
     if (this == &copyStack)
     {
-      return *this;
+        return *this;
     }
     _containerType = copyStack._containerType;
     _pimpl = copyStack._pimpl;
