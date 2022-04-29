@@ -35,13 +35,11 @@ Stack::Stack(const Stack& copyStack): _containerType(copyStack._containerType)
 {
     switch (_containerType)
     {
-    case StackContainer::List: 
-    {
+    case StackContainer::List: {
         _pimpl = dynamic_cast<IStackImplementation*>(new ListStack());
         break;
     }
-    case StackContainer::Vector: 
-    {
+    case StackContainer::Vector: {
         _pimpl = dynamic_cast<IStackImplementation*>(new VectorStack());
         break;
     }
@@ -57,6 +55,7 @@ Stack::Stack(const Stack& copyStack): _containerType(copyStack._containerType)
     for (size_t i = 0; buffer._pimpl->size() != 0; i++)
     {
         _pimpl->push(buffer._pimpl->top());
+        copyStack._pimpl->push(buffer._pimpl->top());
         buffer._pimpl->pop();
     } 
 }
@@ -71,13 +70,11 @@ Stack& Stack::operator=(const Stack& copyStack)
     _containerType = copyStack._containerType;
     switch (_containerType)
     {
-    case StackContainer::List: 
-    {
+    case StackContainer::List: {
         _pimpl = dynamic_cast<IStackImplementation*>(new ListStack());
         break;
     }
-    case StackContainer::Vector: 
-    {
+    case StackContainer::Vector: {
         _pimpl = dynamic_cast<IStackImplementation*>(new VectorStack());
         break;
     }
@@ -86,13 +83,14 @@ Stack& Stack::operator=(const Stack& copyStack)
     }
     Stack buffer;
     while (copyStack._pimpl->size() != 0)
-    {
-        buffer._pimpl->push(copyStack._pimpl->top());
-        copyStack._pimpl->pop();
-    }
+      {
+          buffer._pimpl->push(copyStack._pimpl->top());
+          copyStack._pimpl->pop();
+      }
     for (size_t i = 0; buffer._pimpl->size() != 0; i++)
     {
         _pimpl->push(buffer._pimpl->top());
+        copyStack._pimpl->push(buffer._pimpl->top());
         buffer._pimpl->pop();
     } 
     return *this;
