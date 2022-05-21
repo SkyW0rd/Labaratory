@@ -238,11 +238,11 @@ void Vector::erase(size_t pos, size_t count)
     }
     else
     {
-        for (size_t i = 0; i < count; i++)
+        for (size_t i = 0; i < _size - count + 1; i++)
         {
             _data[i + pos] = _data[i + pos + count];
-            _size--;
         }
+	_size -= count;
     }
 }
 //---------------------------------------------------------------------------
