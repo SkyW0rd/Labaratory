@@ -1,7 +1,7 @@
 #include "Stack.h"
+#include "StackImplementation.h"
 #include "ListStack.h"
 #include "VectorStack.h"
-#include "StackImplementation.h"
 
 #include <stdexcept>
 
@@ -35,29 +35,19 @@ Stack::Stack(const Stack& copyStack): _containerType(copyStack._containerType)
 {
     switch (_containerType)
     {
-    case StackContainer::List: {
-        _pimpl = dynamic_cast<IStackImplementation*>(new ListStack());
+    case StackContainer::List:
+    {
+        _pimpl = dynamic_cast<IStackImplementation*>(new ListStack(*dynamic_cast<ListStack*>(copyStack._pimpl)));
         break;
     }
-    case StackContainer::Vector: {
-        _pimpl = dynamic_cast<IStackImplementation*>(new VectorStack());
+    case StackContainer::Vector:
+    {
+        _pimpl = dynamic_cast<IStackImplementation*>(new VectorStack(*dynamic_cast<VectorStack*>(copyStack._pimpl)));
         break;
     }
     default:
         throw std::runtime_error("Неизвестный тип контейнера");
     }
-    Stack buffer;
-    while (copyStack._pimpl->size() != 0)
-    {
-        buffer._pimpl->push(copyStack._pimpl->top());
-        copyStack._pimpl->pop();
-    }
-    for (size_t i = 0; buffer._pimpl->size() != 0; i++)
-    {
-        _pimpl->push(buffer._pimpl->top());
-        copyStack._pimpl->push(buffer._pimpl->top());
-        buffer._pimpl->pop();
-    } 
 }
 
 Stack& Stack::operator=(const Stack& copyStack)
@@ -70,30 +60,21 @@ Stack& Stack::operator=(const Stack& copyStack)
     _containerType = copyStack._containerType;
     switch (_containerType)
     {
-    case StackContainer::List: {
-        _pimpl = dynamic_cast<IStackImplementation*>(new ListStack());
+    case StackContainer::List: 
+    {
+        _pimpl = dynamic_cast<IStackImplementation*>(new ListStack(*dynamic_cast<ListStack*>(copyStack._pimpl)));
         break;
     }
-    case StackContainer::Vector: {
-        _pimpl = dynamic_cast<IStackImplementation*>(new VectorStack());
+    case StackContainer::Vector:
+    {
+        _pimpl = dynamic_cast<IStackImplementation*>(new VectorStack(*dynamic_cast<VectorStack*>(copyStack._pimpl)));
         break;
     }
     default:
         throw std::runtime_error("Неизвестный тип контейнера");
     }
-    Stack buffer;
-    while (copyStack._pimpl->size() != 0)
-      {
-          buffer._pimpl->push(copyStack._pimpl->top());
-          copyStack._pimpl->pop();
-      }
-    for (size_t i = 0; buffer._pimpl->size() != 0; i++)
-    {
-        _pimpl->push(buffer._pimpl->top());
-        copyStack._pimpl->push(buffer._pimpl->top());
-        buffer._pimpl->pop();
-    } 
     return *this;
+    
 }
 Stack::Stack(Stack&& moveStack) noexcept
 {
@@ -110,6 +91,7 @@ Stack& Stack::operator=(Stack&& moveStack) noexcept
     }
     _containerType = std::move(moveStack._containerType);
     _pimpl = std::move(moveStack._pimpl);
+    moveStack._pimpl = nullptr;
     return *this;
 }
 
