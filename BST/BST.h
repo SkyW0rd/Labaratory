@@ -63,6 +63,6 @@ public:
     void print();
 private:
     size_t _size = 0;
-    Node* _root = nullptr; //!< корневой узел дерева
+    Node* _root = nullptr;
     void add(Node* pref, Node* current);
 };
