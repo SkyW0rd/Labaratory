@@ -1,4 +1,3 @@
-#pragma once
 #include <cstddef>
 #include <iostream>
 #include <utility>
@@ -13,26 +12,27 @@ class BinarySearchTree
 {
     struct Node
     {
-        Node(Key key, 
-             Value value, 
-             Node* parent = nullptr, 
-             Node* left = nullptr, 
-             Node* right = nullptr);
+        Node(Key key,
+            Value value,
+            Node* parent = nullptr,
+            Node* left = nullptr,
+            Node* right = nullptr);
 
         std::pair<Key, Value> keyValuePair;
         Node* parent = nullptr;
         Node* left = nullptr;
         Node* right = nullptr;
     };
-void add(Node* pref, Node* current);
-void _print(Node* pref, int level = 0);
-void _erase(Node* pref, Key& key);
-Node* leftbranch(Node* node);
-Node* rightbranch(Node* node);
+private:
+    void add(Node* pref, Node* current);
+    void _print(Node* pref, int level = 0);
+    Node* _erase(Node* pref, const Key& key);
+    Node* minVal(Node* pref);
+
 public:
     //! Конструктор по умолчанию
     BinarySearchTree() = default;
-    
+
     //! Копирование
     explicit BinarySearchTree(const BinarySearchTree& other);
     BinarySearchTree& operator=(const BinarySearchTree& other);
@@ -46,12 +46,12 @@ public:
     /*!
         Итератор бинарного дерева поиска
 
-        Обходит дерево последовательно от меньшего ключа к большему 
+        Обходит дерево последовательно от меньшего ключа к большему
     */
     class Iterator
     {
     public:
-        explicit Iterator(Node* node);
+        explicit Iterator(Node* node):_node(node){}
 
         std::pair<Key, Value>& operator*();
         const std::pair<Key, Value>& operator*() const;
@@ -78,7 +78,7 @@ public:
     class ConstIterator
     {
     public:
-        explicit ConstIterator(const Node* node);
+        explicit ConstIterator(const Node* node):_node(node){}
 
         const std::pair<Key, Value>& operator*() const;
 
@@ -148,7 +148,7 @@ public:
     using ConstMapIterator = typename BinarySearchTree<Key, Value>::ConstIterator;
 
     Map() = default;
-    
+
     explicit Map(const Map& other);
     Map& operator=(const Map& other);
 
@@ -192,7 +192,7 @@ template <typename Value>
 class Set
 {
     Map<Value, Value> _map;
-
+    bool _contains(Map<Value, Value>& pref, const Value& value);
 public:
     using SetIterator = typename Map<Value, Value>::MapIterator;
     using ConstSetIterator = typename Map<Value, Value>::ConstMapIterator;
