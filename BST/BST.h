@@ -592,7 +592,7 @@ typename BinarySearchTree<Key, Value>::Iterator BinarySearchTree<Key, Value>::fi
     {
         throw std::runtime_error("Not found");
     }
-    return Iterator(&current);
+    return Iterator(current);
 }
 // найти все элементы, у которых ключ равен key
 // первый итератор пары - первый элемент в дереве, равный key
@@ -601,15 +601,7 @@ typename BinarySearchTree<Key, Value>::Iterator BinarySearchTree<Key, Value>::fi
 template <typename Key, typename Value>
 std::pair<typename BinarySearchTree<Key, Value>::Iterator, typename BinarySearchTree<Key, Value>::Iterator> BinarySearchTree<Key, Value>::equalRange(const Key& key)
 {
-    Node* current = _root;
-    while (current != nullptr || (current->left->keyValuePair.first != key && current->right->keyValuePair.first != key && current->keyValuePair.first == key))
-    {
-        current = current->keyValuePair.first >= key ? current->right : current->left;
-    }
-    if (current == nullptr)
-    {
-        throw std::runtime_error("Not found");
-    }
+    Node* current = find(key);
     Node* pref = current;
     while (pref->right->keyValuePair.first > key)
     {
@@ -655,12 +647,12 @@ typename BinarySearchTree<Key, Value>::ConstIterator BinarySearchTree<Key, Value
 template <typename Key, typename Value>
 typename BinarySearchTree<Key, Value>::Iterator BinarySearchTree<Key, Value>::begin()
 {
-    return Iterator(_root->left);
+    return Iterator(minVal(_root));
 }
 template <typename Key, typename Value>
 typename BinarySearchTree<Key, Value>::Iterator BinarySearchTree<Key, Value>::end()
 {
-    return Iterator(_root->right);
+    return Iterator(nullptr);
 }
 template <typename Key, typename Value>
 typename BinarySearchTree<Key, Value>::ConstIterator BinarySearchTree<Key, Value>::cbegin() const
@@ -863,4 +855,5 @@ void BinarySearchTree<Key, Value>::_print(Node* pref, int level)
         std::cout << pref->keyValuePair.first << " " << pref->keyValuePair.second << std::endl;
         _print(pref->right, level + 1);
     }
+}
 }
